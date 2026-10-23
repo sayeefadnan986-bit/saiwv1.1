@@ -1,266 +1,637 @@
+
 <!DOCTYPE html>
 <html lang="bn">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WikiMaster AI Bot - Sayeef Adnan</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080d1a">
+  <meta name="description" content="WikiMaster AI Bot by Sayeef Adnan — search Wikipedia articles with a modern, multilingual interface.">
+  <title>WikiMaster AI | Sayeef Adnan</title>
   <style>
     :root {
-      --primary-color: #2563eb;
-      --primary-hover: #1d4ed8;
-      --bg-color: #f8fafc;
-      --card-bg: #ffffff;
-      --text-main: #1e293b;
-      --text-muted: #64748b;
-      --border-color: #e2e8f0;
+      color-scheme: dark;
+      --bg: #080d1a;
+      --panel: rgba(17, 26, 48, .88);
+      --line: rgba(148, 163, 184, .18);
+      --text: #edf4ff;
+      --muted: #9eacc4;
+      --blue: #67e8f9;
+      --purple: #a78bfa;
+      --green: #86efac;
+      --red: #fca5a5;
     }
+
+    * { box-sizing: border-box; }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-main);
       margin: 0;
-      padding: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       min-height: 100vh;
+      font-family: system-ui, -apple-system, "Noto Sans Bengali",
+        "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 15% 0%, #15264a 0, transparent 40%),
+        radial-gradient(ellipse at 90% 15%, #24184c 0, transparent 35%),
+        var(--bg);
     }
 
-    .main-container {
-      width: 100%;
-      max-width: 700px;
-      background: var(--card-bg);
-      border-radius: 16px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
-      overflow: hidden;
+    button, input, select { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+
+    .wrap {
+      width: min(960px, 100%);
+      margin: auto;
+      padding: 24px 18px 36px;
+    }
+
+    header {
       display: flex;
-      flex-direction: column;
-    }
-
-    .app-header {
-      background: linear-gradient(135deg, #1e40af, #2563eb);
-      color: white;
-      padding: 25px;
-      text-align: center;
-    }
-
-    .app-header h1 {
-      margin: 0 0 8px 0;
-      font-size: 26px;
-    }
-
-    .developer-badge {
-      background: rgba(255, 255, 255, 0.2);
-      padding: 5px 14px;
-      border-radius: 20px;
-      font-size: 13px;
-      display: inline-block;
-      backdrop-filter: blur(5px);
-      letter-spacing: 0.5px;
-    }
-
-    .content-body {
-      padding: 25px;
-    }
-
-    .search-box-group {
-      display: flex;
+      align-items: center;
+      justify-content: space-between;
       gap: 12px;
-      margin-bottom: 20px;
+      margin-bottom: 54px;
     }
 
-    select, input {
-      padding: 12px 15px;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-weight: 800;
+      letter-spacing: -.4px;
+    }
+
+    .logo {
+      display: grid;
+      place-items: center;
+      width: 43px;
+      height: 43px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #67e8f9, #818cf8 65%, #c084fc);
+      color: #07101f;
+      font-size: 22px;
+      box-shadow: 0 0 28px #67e8f933;
+    }
+
+    .brand small {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-weight: 500;
+      font-size: 11px;
+      letter-spacing: 1.4px;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 11px;
+      white-space: nowrap;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #fbbf24;
+    }
+
+    .dot.online { background: #4ade80; }
+    .dot.offline { background: #fb7185; }
+
+    .hero { text-align: center; margin-bottom: 30px; }
+
+    .eyebrow {
+      display: inline-block;
+      border: 1px solid #67e8f944;
+      background: #67e8f90c;
+      color: var(--blue);
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 7vw, 60px);
+      line-height: 1.12;
+      letter-spacing: -1.8px;
+    }
+
+    .gradient {
+      background: linear-gradient(90deg, #67e8f9, #a78bfa, #f0abfc);
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+    }
+
+    .subtitle {
+      max-width: 600px;
+      margin: 17px auto 0;
+      color: var(--muted);
       font-size: 15px;
+      line-height: 1.9;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 23px;
+      padding: clamp(17px, 4vw, 28px);
+      box-shadow: 0 22px 80px #0004;
+      backdrop-filter: blur(18px);
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 13px;
+      color: #d5def0;
+      font-weight: 650;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    input, select {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid var(--line);
       outline: none;
-      transition: all 0.3s;
-    }
-
-    select {
-      background: #fff;
-      cursor: pointer;
-    }
-
-    input {
-      flex: 1;
+      background: #080f20;
+      color: var(--text);
+      border-radius: 13px;
+      padding: 15px;
     }
 
     input:focus, select:focus {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+      border-color: #67e8f9a6;
+      box-shadow: 0 0 0 3px #67e8f914;
     }
 
-    button {
-      padding: 12px 24px;
-      background-color: var(--primary-color);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: 600;
+    .primary, .secondary, .suggestion {
+      border: 0;
+      border-radius: 13px;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: transform .18s, opacity .18s;
     }
 
-    button:hover {
-      background-color: var(--primary-hover);
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity: .55; cursor: wait; transform: none; }
+
+    .primary {
+      flex-shrink: 0;
+      padding: 0 21px;
+      color: #07101f;
+      font-weight: 800;
+      background: linear-gradient(120deg, #67e8f9, #a78bfa);
     }
 
-    .loading-spinner {
+    .options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .options label { color: var(--muted); font-size: 12px; }
+    .options select { margin-top: 7px; padding: 11px; }
+
+    .suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 19px;
+    }
+
+    .suggestion {
+      padding: 8px 11px;
+      border: 1px solid var(--line);
+      background: #ffffff06;
+      color: #d5def0;
+      font-size: 12px;
+    }
+
+    .message {
+      display: none;
+      margin-top: 17px;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      line-height: 1.7;
+      overflow-wrap: anywhere;
+      font-size: 13px;
+    }
+
+    .message.show { display: block; }
+    .message.error { color: var(--red); background: #7f1d1d18; }
+    .message.info { color: var(--blue); background: #0e749018; }
+
+    .loading {
       display: none;
       text-align: center;
-      padding: 20px;
-      color: var(--primary-color);
-      font-weight: 500;
+      padding: 28px 10px 8px;
+      color: var(--muted);
     }
 
-    .result-box {
+    .loading.show { display: block; }
+
+    .spinner {
+      width: 35px;
+      height: 35px;
+      border: 3px solid #ffffff18;
+      border-top-color: var(--blue);
+      border-right-color: var(--purple);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+      margin: 0 auto 13px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .result {
       display: none;
-      background: #f1f5f9;
-      border-left: 5px solid var(--primary-color);
-      padding: 20px;
-      border-radius: 8px;
-      margin-top: 15px;
-      animation: fadeIn 0.4s ease-in-out;
+      margin-top: 20px;
+      animation: appear .3s ease;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(5px); }
+    .result.show { display: block; }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .result-box h3 {
-      margin-top: 0;
-      color: #0f172a;
+    .result-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
     }
 
-    .analytics-tag {
-      background: #e2e8f0;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 13px;
+    .result h2 {
+      margin: 0;
+      font-size: clamp(21px, 4vw, 29px);
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+    }
+
+    .tag {
       display: inline-block;
-      margin-top: 10px;
-      font-weight: 500;
+      color: var(--green);
+      background: #22c55e13;
+      border: 1px solid #22c55e33;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      white-space: nowrap;
     }
 
-    .wiki-link {
-      display: inline-block;
-      margin-top: 15px;
-      color: var(--primary-color);
-      text-decoration: none;
-      font-weight: 600;
+    .description {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      color: #cbd5e1;
+      font-size: 14px;
+      line-height: 1.95;
+      margin: 17px 0;
     }
 
-    .wiki-link:hover {
-      text-decoration: underline;
-    }
-
-    .app-footer {
-      text-align: center;
-      padding: 15px;
-      background: #f8fafc;
-      border-top: 1px solid var(--border-color);
+    .analytics {
+      color: var(--muted);
       font-size: 12px;
-      color: var(--text-muted);
+      line-height: 1.7;
+      border-top: 1px solid var(--line);
+      padding-top: 13px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 17px;
+    }
+
+    .secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      background: #ffffff08;
+      color: var(--text);
+      font-size: 12px;
+    }
+
+    footer {
+      text-align: center;
+      color: #7f8da7;
+      font-size: 12px;
+      line-height: 1.9;
+      margin-top: 32px;
+    }
+
+    footer strong { color: #c4b5fd; }
+
+    @media (max-width: 560px) {
+      .wrap { padding: 17px 13px 28px; }
+      header { margin-bottom: 38px; }
+      .brand { font-size: 13px; }
+      .status { font-size: 10px; padding: 7px 8px; }
+      .search-row { flex-direction: column; }
+      .primary { min-height: 47px; }
+      .options { grid-template-columns: 1fr; }
+      .result-top { flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+      }
     }
   </style>
 </head>
 <body>
-
-<div class="main-container">
-  <!-- Header -->
-  <div class="app-header">
-    <h1>WikiMaster AI Bot 🤖</h1>
-    <div class="developer-badge">✨ Developed & Created by সাঈফ আদনান (Sayeef Adnan)</div>
-  </div>
-
-  <!-- Body -->
-  <div class="content-body">
-    <div class="search-box-group">
-      <select id="langSelect">
-        <option value="bn">বাংলা (Bengali)</option>
-        <option value="en">English</option>
-      </select>
-      <input type="text" id="userQuery" placeholder="উইকিপিডিয়া থেকে যেকোনো তথ্য খুঁজুন (যেমন: বাংলাদেশ, আইনস্টাইন)..." onkeypress="handleKeyPress(event)" />
-      <button onclick="askBot()">খুঁজুন</button>
-    </div>
-
-    <div id="loading" class="loading-spinner">
-      🔄 উইকিপিডিয়া এপিআই থেকে তথ্য ও অ্যানালিটিক্স বিশ্লেষণ করা হচ্ছে...
-    </div>
-
-    <div id="resultBox" class="result-box">
-      <h3 id="resTitle"></h3>
-      <p id="resDescription"></p>
-      <div id="resAnalytics" class="analytics-tag"></div>
-      <div>
-        <a id="resLink" href="#" target="_blank" class="wiki-link">উইকিপিডিয়ায় সম্পূর্ণ নিবন্ধ পড়ুন ➔</a>
+  <main class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">W</div>
+        <div>
+          WikiMaster AI
+          <small>KNOWLEDGE EXPLORER</small>
+        </div>
       </div>
-    </div>
-  </div>
+      <div class="status" role="status" aria-live="polite">
+        <span class="dot" id="statusDot"></span>
+        <span id="statusText">Checking API…</span>
+      </div>
+    </header>
 
-  <!-- Footer -->
-  <div class="app-footer">
-    <p>Powered by MediaWiki REST, Action & Analytics APIs | Creator: <strong>সাঈফ আদনান</strong></p>
-  </div>
-</div>
+    <section class="hero">
+      <div class="eyebrow">✦ YOUR SMART WIKIPEDIA COMPANION</div>
+      <h1>Explore knowledge.<br><span class="gradient">Think beyond.</span></h1>
+      <p class="subtitle">
+        Wikipedia-তে যেকোনো বিষয় খুঁজে দেখো। বাংলা অথবা ইংরেজিতে প্রশ্ন লেখো
+        এবং সহজে নিবন্ধের সারাংশ ও মূল উৎসে পৌঁছে যাও।
+      </p>
+    </section>
 
-<script>
-  function handleKeyPress(event) {
-    if (event.key === 'Enter') {
-      askBot();
+    <section class="panel" aria-label="Wikipedia search">
+      <form id="searchForm">
+        <label class="field-label" for="query">তুমি কী জানতে চাও?</label>
+        <div class="search-row">
+          <input id="query" name="query" maxlength="200"
+            placeholder="যেমন: সৌরজগৎ, Artificial Intelligence…"
+            autocomplete="off" required>
+          <button class="primary" id="searchBtn" type="submit">⌕ Search</button>
+        </div>
+
+        <div class="options">
+          <label for="language">
+            Wikipedia language
+            <select id="language">
+              <option value="bn">বাংলা (Bangla)</option>
+              <option value="en">English</option>
+            </select>
+          </label>
+          <label for="detail">
+            Summary length
+            <select id="detail">
+              <option value="normal">Standard</option>
+              <option value="short">Short</option>
+              <option value="long">Detailed</option>
+            </select>
+          </label>
+        </div>
+      </form>
+
+      <div class="suggestions" aria-label="Example searches">
+        <button class="suggestion" type="button" data-query="বাংলাদেশ">বাংলাদেশ</button>
+        <button class="suggestion" type="button" data-query="মহাকাশ">মহাকাশ</button>
+        <button class="suggestion" type="button" data-query="কৃত্রিম বুদ্ধিমত্তা">কৃত্রিম বুদ্ধিমত্তা</button>
+        <button class="suggestion" type="button" data-query="Albert Einstein">Albert Einstein</button>
+      </div>
+
+      <div id="message" class="message" role="alert" aria-live="polite"></div>
+
+      <div id="loading" class="loading" aria-live="polite">
+        <div class="spinner"></div>
+        <div id="loadingText">Wikipedia-তে খোঁজা হচ্ছে…</div>
+      </div>
+
+      <article id="result" class="result" aria-live="polite">
+        <div class="result-top">
+          <h2 id="resTitle"></h2>
+          <span class="tag">WIKIPEDIA RESULT</span>
+        </div>
+        <p id="resDescription" class="description"></p>
+        <div id="resAnalytics" class="analytics"></div>
+        <div class="actions">
+          <a id="resLink" class="secondary" href="#" target="_blank"
+            rel="noopener noreferrer">↗ Open Wikipedia</a>
+          <button id="copyBtn" class="secondary" type="button">▣ Copy summary</button>
+          <button id="shareBtn" class="secondary" type="button">↗ Share</button>
+        </div>
+      </article>
+    </section>
+
+    <footer>
+      Built with curiosity by <strong>Sayeef Adnan</strong>.<br>
+      Powered by Wikipedia and Wikimedia APIs. Not affiliated with Wikimedia Foundation.
+    </footer>
+  </main>
+
+  <script>
+    "use strict";
+
+    const $ = (id) => document.getElementById(id);
+    const form = $("searchForm");
+    const queryInput = $("query");
+    const searchBtn = $("searchBtn");
+    const loading = $("loading");
+    const result = $("result");
+    const message = $("message");
+
+    let latestResult = null;
+
+    function showMessage(text, type = "info") {
+      message.textContent = text;
+      message.className = "message show " + type;
     }
-  }
 
-  async function askBot() {
-    const query = document.getElementById('userQuery').value.trim();
-    const lang = document.getElementById('langSelect').value;
-    const loadingDiv = document.getElementById('loading');
-    const resultBox = document.getElementById('resultBox');
-
-    if (!query) {
-      alert('অনুগ্রহ করে অনুসন্ধান বাক্সে কিছু লিখুন!');
-      return;
+    function clearMessage() {
+      message.textContent = "";
+      message.className = "message";
     }
 
-    // UI রিসেট ও লোডিং শুরু
-    resultBox.style.display = 'none';
-    loadingDiv.style.display = 'block';
+    function setLoading(active) {
+      loading.classList.toggle("show", active);
+      searchBtn.disabled = active;
+      searchBtn.textContent = active ? "Searching…" : "⌕ Search";
+      queryInput.disabled = active;
+    }
 
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: query, lang: lang })
-      });
+    async function checkApiStatus() {
+      const dot = $("statusDot");
+      const label = $("statusText");
 
-      const data = await response.json();
-      loadingDiv.style.display = 'none';
+      try {
+        const response = await fetch("/api/status", {
+          method: "GET",
+          headers: { "Accept": "application/json" },
+          cache: "no-store"
+        });
+        if (!response.ok) throw new Error("API unavailable");
 
-      if (data.error) {
-        alert(data.error);
+        const data = await response.json();
+        if (!data.ok) throw new Error("API unavailable");
+
+        dot.className = "dot online";
+        label.textContent = "API Online";
+      } catch {
+        dot.className = "dot offline";
+        label.textContent = "API Unavailable";
+      }
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const query = queryInput.value.trim();
+      if (!query) {
+        showMessage("অনুগ্রহ করে একটি বিষয় লিখো।", "error");
+        queryInput.focus();
         return;
       }
 
-      // ডেটা বসানো
-      document.getElementById('resTitle').innerText = "📌 " + data.matchedTitle;
-      document.getElementById('resDescription').innerText = data.answer;
-      document.getElementById('resAnalytics').innerText = `📊 গত ৩০ দিনে এই পেজটি ভিজিট হয়েছে: ${data.analytics.last30DaysViews} বার (দৈনিক গড়: ${data.analytics.dailyAverage})`;
-      document.getElementById('resLink').href = data.sourceUrl;
+      if (query.length > 200) {
+        showMessage("সার্চের বিষয়টি ২০০ অক্ষরের মধ্যে রাখো।", "error");
+        return;
+      }
 
-      // রেজাল্ট বক্স দেখানো
-      resultBox.style.display = 'block';
+      clearMessage();
+      result.classList.remove("show");
+      setLoading(true);
+      $("loadingText").textContent = "Wikipedia-তে খোঁজা হচ্ছে…";
 
-    } catch (error) {
-      loadingDiv.style.display = 'none';
-      alert('সার্ভারে সংযোগ স্থাপন করা যাচ্ছে না। দয়া করে কিছুক্ষণ পর আবার চেষ্টা করুন।');
-    }
-  }
-</script>
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 18000);
 
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify({
+            message: query,
+            lang: $("language").value,
+            detail: $("detail").value
+          }),
+          signal: controller.signal
+        });
+
+        let data;
+        try {
+          data = await response.json();
+        } catch {
+          throw new Error("সার্ভার থেকে সঠিক JSON উত্তর পাওয়া যায়নি।");
+        }
+
+        if (!response.ok || !data.ok) {
+          throw new Error(data.error || "এই মুহূর্তে সার্চ সম্পন্ন করা যায়নি।");
+        }
+
+        if (!data.title || !data.answer || !data.sourceUrl) {
+          throw new Error("সার্ভারের উত্তরে প্রয়োজনীয় তথ্য নেই।");
+        }
+
+        latestResult = data;
+        $("resTitle").textContent = data.title;
+        $("resDescription").textContent = data.answer;
+        $("resLink").href = data.sourceUrl;
+
+        if (data.analytics && data.analytics.last30DaysViews !== null) {
+          $("resAnalytics").textContent =
+            "📊 গত ৩০ দিনে পেজ ভিউ: " +
+            Number(data.analytics.last30DaysViews).toLocaleString() +
+            " | দৈনিক গড়: " +
+            Number(data.analytics.dailyAverage).toLocaleString();
+        } else {
+          $("resAnalytics").textContent =
+            "📊 পেজ ভিউয়ের পরিসংখ্যান এই মুহূর্তে পাওয়া যায়নি।";
+        }
+
+        result.classList.add("show");
+      } catch (error) {
+        const text = error.name === "AbortError"
+          ? "অনুরোধের সময় শেষ হয়েছে। আবার চেষ্টা করো।"
+          : error.message || "নেটওয়ার্ক সমস্যা হয়েছে। আবার চেষ্টা করো।";
+
+        showMessage(text, "error");
+      } finally {
+        clearTimeout(timeout);
+        setLoading(false);
+        checkApiStatus();
+      }
+    });
+
+    document.querySelectorAll("[data-query]").forEach((button) => {
+      button.addEventListener("click", () => {
+        queryInput.value = button.dataset.query;
+        form.requestSubmit();
+      });
+    });
+
+    $("copyBtn").addEventListener("click", async () => {
+      if (!latestResult) return;
+      const text = latestResult.title + "\n\n" +
+        latestResult.answer + "\n\n" + latestResult.sourceUrl;
+
+      try {
+        await navigator.clipboard.writeText(text);
+        showMessage("সারাংশ কপি করা হয়েছে।", "info");
+      } catch {
+        showMessage("কপি করা যায়নি। লেখাটি নির্বাচন করে কপি করো।", "error");
+      }
+    });
+
+    $("shareBtn").addEventListener("click", async () => {
+      if (!latestResult) return;
+
+      const shareData = {
+        title: latestResult.title + " — WikiMaster",
+        text: latestResult.answer.slice(0, 250),
+        url: latestResult.sourceUrl
+      };
+
+      try {
+        if (navigator.share) {
+          await navigator.share(shareData);
+        } else {
+          await navigator.clipboard.writeText(
+            shareData.title + "\n" + shareData.url
+          );
+          showMessage("শেয়ার লিংক কপি করা হয়েছে।", "info");
+        }
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          showMessage("শেয়ার করা যায়নি। Wikipedia লিংকটি ব্যবহার করো।", "error");
+        }
+      }
+    });
+
+    checkApiStatus();
+  </script>
 </body>
 </html>
