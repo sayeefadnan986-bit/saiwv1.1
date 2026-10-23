@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WikiMaster AI Bot - Sayeef Adnan</title>
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .main-container {
+      width: 100%;
+      max-width: 700px;
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-header {
+      background: linear-gradient(135deg, #1e40af, #2563eb);
+      color: white;
+      padding: 25px;
+      text-align: center;
+    }
+
+    .app-header h1 {
+      margin: 0 0 8px 0;
+      font-size: 26px;
+    }
+
+    .developer-badge {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      display: inline-block;
+      backdrop-filter: blur(5px);
+      letter-spacing: 0.5px;
+    }
+
+    .content-body {
+      padding: 25px;
+    }
+
+    .search-box-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    select, input {
+      padding: 12px 15px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    select {
+      background: #fff;
+      cursor: pointer;
+    }
+
+    input {
+      flex: 1;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    button {
+      padding: 12px 24px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .loading-spinner {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      color: var(--primary-color);
+      font-weight: 500;
+    }
+
+    .result-box {
+      display: none;
+      background: #f1f5f9;
+      border-left: 5px solid var(--primary-color);
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 15px;
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-box h3 {
+      margin-top: 0;
+      color: #0f172a;
+    }
+
+    .analytics-tag {
+      background: #e2e8f0;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      display: inline-block;
+      margin-top: 10px;
+      font-weight: 500;
+    }
+
+    .wiki-link {
+      display: inline-block;
+      margin-top: 15px;
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .wiki-link:hover {
+      text-decoration: underline;
+    }
+
+    .app-footer {
+      text-align: center;
+      padding: 15px;
+      background: #f8fafc;
+      border-top: 1px solid var(--border-color);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+<div class="main-container">
+  <!-- Header -->
+  <div class="app-header">
+    <h1>WikiMaster AI Bot 🤖</h1>
+    <div class="developer-badge">✨ Developed & Created by সাঈফ আদনান (Sayeef Adnan)</div>
+  </div>
+
+  <!-- Body -->
+  <div class="content-body">
+    <div class="search-box-group">
+      <select id="langSelect">
+        <option value="bn">বাংলা (Bengali)</option>
+        <option value="en">English</option>
+      </select>
+      <input type="text" id="userQuery" placeholder="উইকিপিডিয়া থেকে যেকোনো তথ্য খুঁজুন (যেমন: বাংলাদেশ, আইনস্টাইন)..." onkeypress="handleKeyPress(event)" />
+      <button onclick="askBot()">খুঁজুন</button>
+    </div>
+
+    <div id="loading" class="loading-spinner">
+      🔄 উইকিপিডিয়া এপিআই থেকে তথ্য ও অ্যানালিটিক্স বিশ্লেষণ করা হচ্ছে...
+    </div>
+
+    <div id="resultBox" class="result-box">
+      <h3 id="resTitle"></h3>
+      <p id="resDescription"></p>
+      <div id="resAnalytics" class="analytics-tag"></div>
+      <div>
+        <a id="resLink" href="#" target="_blank" class="wiki-link">উইকিপিডিয়ায় সম্পূর্ণ নিবন্ধ পড়ুন ➔</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="app-footer">
+    <p>Powered by MediaWiki REST, Action & Analytics APIs | Creator: <strong>সাঈফ আদনান</strong></p>
+  </div>
+</div>
+
+<script>
+  function handleKeyPress(event) {
+    if (event.key === 'Enter') {
+      askBot();
+    }
+  }
+
+  async function askBot() {
+    const query = document.getElementById('userQuery').value.trim();
+    const lang = document.getElementById('langSelect').value;
+    const loadingDiv = document.getElementById('loading');
+    const resultBox = document.getElementById('resultBox');
+
+    if (!query) {
+      alert('অনুগ্রহ করে অনুসন্ধান বাক্সে কিছু লিখুন!');
+      return;
+    }
+
+    // UI রিসেট ও লোডিং শুরু
+    resultBox.style.display = 'none';
+    loadingDiv.style.display = 'block';
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: query, lang: lang })
+      });
+
+      const data = await response.json();
+      loadingDiv.style.display = 'none';
+
+      if (data.error) {
+        alert(data.error);
+        return;
+      }
+
+      // ডেটা বসানো
+      document.getElementById('resTitle').innerText = "📌 " + data.matchedTitle;
+      document.getElementById('resDescription').innerText = data.answer;
+      document.getElementById('resAnalytics').innerText = `📊 গত ৩০ দিনে এই পেজটি ভিজিট হয়েছে: ${data.analytics.last30DaysViews} বার (দৈনিক গড়: ${data.analytics.dailyAverage})`;
+      document.getElementById('resLink').href = data.sourceUrl;
+
+      // রেজাল্ট বক্স দেখানো
+      resultBox.style.display = 'block';
+
+    } catch (error) {
+      loadingDiv.style.display = 'none';
+      alert('সার্ভারে সংযোগ স্থাপন করা যাচ্ছে না। দয়া করে কিছুক্ষণ পর আবার চেষ্টা করুন।');
+    }
+  }
+</script>
+
+</body>
+</html>
