@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>WikiBot - Created by Sayeef Adnan</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+    .chat-container { max-width: 650px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .header { text-align: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
+    .developer-tag { background: #007bff; color: white; padding: 4px 12px; border-radius: 20px; font-size: 13px; display: inline-block; }
+    .input-box { display: flex; gap: 10px; margin-top: 20px; }
+    input { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
+    button { padding: 12px 20px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
+    .result-card { margin-top: 20px; padding: 15px; background: #f8f9fa; border-left: 4px solid #007bff; border-radius: 4px; }
+    .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+  </style>
+</head>
+<body>
+
+<div class="chat-container">
+  <div class="header">
+    <h2>WikiMaster Bot 🤖</h2>
+    <span class="developer-tag">Designed & Built by সাঈফ আদনান (Sayeef Adnan)</span>
+  </div>
+
+  <div>
+    <label for="userQuery">উইকিপিডিয়াকে যা খুশি জিজ্ঞাসা করুন:</label>
+    <div class="input-box">
+      <input type="text" id="userQuery" placeholder="যেমন: বাংলাদেশ, রেশম পথ, আইনস্টাইন..." />
+      <button onclick="askBot()">জিজ্ঞাসা করুন</button>
+    </div>
+  </div>
+
+  <div id="output" style="display:none;" class="result-card"></div>
+
+  <div class="footer">
+    <p>Powered by MediaWiki REST, Action & Analytics APIs | Developed by Sayeef Adnan</p>
+  </div>
+</div>
+
+<script>
+async function askBot() {
+  const query = document.getElementById('userQuery').value;
+  const outputDiv = document.getElementById('output');
+  
+  if(!query) return alert('অনুগ্রহ করে কিছু লিখুন!');
+
+  outputDiv.style.display = 'block';
+  outputDiv.innerHTML = "উইকিপিডিয়া থেকে উত্তর ও এনালাইটিক্স সংগ্রহ করা হচ্ছে...";
+
+  try {
+    const res = await fetch('http://localhost:3000/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: query, lang: 'bn' })
+    });
+    
+    const data = await res.json();
+
+    if(data.error) {
+      outputDiv.innerHTML = `<p style="color:red;">${data.error}</p>`;
+      return;
+    }
+
+    outputDiv.innerHTML = `
+      <h3>📌 ${data.matchedTitle}</h3>
+      <p>${data.answer}</p>
+      <hr>
+      <p>📊 <strong>গত ৩০ দিনের ভিউ:</strong> ${data.analytics.last30DaysViews}</p>
+      <p>🔗 <a href="${data.sourceUrl}" target="_blank">উইকিপিডিয়ায় পুরোটা পড়ুন</a></p>
+      <br>
+      <small style="color:#0056b3;">© ${data.developerCredits.notice}</small>
+    `;
+  } catch (err) {
+    outputDiv.innerHTML = "<p style='color:red;'>সার্ভারে কানেক্ট করা যাচ্ছে না। Express সার্ভার চালু আছে কি না পরীক্ষা করুন।</p>";
+  }
+}
+</script>
+
+</body>
+</html>
