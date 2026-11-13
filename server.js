@@ -3,6 +3,7 @@
 const express = require("express");
 const axios = require("axios");
 const path = require("path");
+const { handleMedia } = require("./media-search");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -77,7 +78,6 @@ async function getArticleSummary(title, lang, detail) {
         exintro: 1,
         exchars: detail === "short" ? 1000 : detail === "long" ? 6500 : 3000,
         explaintext: 1,
-        explaintext: 1,
         piprop: "thumbnail|original",
         pithumbsize: 1200,
         plnamespace: 0,
@@ -103,7 +103,7 @@ async function getArticleSummary(title, lang, detail) {
     throw new Error("Wikipedia returned an empty summary.");
   }
 
-  const sourceUrl = (page.fullurl) ||
+  const sourceUrl = page.fullurl ||
     (summary.content_urls && summary.content_urls.desktop && summary.content_urls.desktop.page) ||
     `https://${lang}.wikipedia.org/wiki/${safeTitle}`;
   const imageUrl = (page.original && page.original.source) ||
@@ -139,7 +139,6 @@ async function getPageViews(title, lang) {
     const total = items.reduce((sum, item) => sum + (Number(item.views) || 0), 0);
     return { last30DaysViews: total, dailyAverage: Math.round(total / 30) };
   } catch {
-    // Page-view statistics are optional and must not break an article search.
     return null;
   }
 }
@@ -158,17 +157,10 @@ async function handleChat(req, res) {
   try {
     const matchedTitle = await findArticle(message, lang);
     if (!matchedTitle) {
-      return sendError(
-        res,
-        404,
-        "এই ভাষার Wikipedia-তে বিষয়টির কোনো মিল পাওয়া যায়নি। অন্য শব্দে চেষ্টা করো।",
-        "ARTICLE_NOT_FOUND"
-      );
+      return sendError(res, 404, "এই ভাষার Wikipedia-তে বিষয়টির কোনো মিল পাওয়া যায়নি। অন্য শব্দে চেষ্টা করো।", "ARTICLE_NOT_FOUND");
     }
-
     const article = await getArticleSummary(matchedTitle, lang, detail);
     const analytics = await getPageViews(article.title, lang);
-
     return res.status(200).json({
       ok: true,
       title: article.title,
@@ -184,35 +176,26 @@ async function handleChat(req, res) {
     });
   } catch (error) {
     const status = error.response && error.response.status;
-    if (status === 404) {
-      return sendError(res, 404, "নিবন্ধটি পাওয়া গেলেও তার সারাংশ আনা যায়নি। অন্য বিষয় দিয়ে চেষ্টা করো।", "SUMMARY_NOT_FOUND");
-    }
-    if (error.code === "ECONNABORTED" || error.code === "ETIMEDOUT") {
-      return sendError(res, 504, "Wikipedia থেকে উত্তর পেতে বেশি সময় লাগছে। কিছুক্ষণ পরে আবার চেষ্টা করো।", "UPSTREAM_TIMEOUT");
-    }
+    if (status === 404) return sendError(res, 404, "নিবন্ধটি পাওয়া গেলেও তার সারাংশ আনা যায়নি। অন্য বিষয় দিয়ে চেষ্টা করো।", "SUMMARY_NOT_FOUND");
+    if (error.code === "ECONNABORTED" || error.code === "ETIMEDOUT") return sendError(res, 504, "Wikipedia থেকে উত্তর পেতে বেশি সময় লাগছে। কিছুক্ষণ পরে আবার চেষ্টা করো।", "UPSTREAM_TIMEOUT");
     console.error("Wikipedia request failed:", { message: error.message, status });
     return sendError(res, 502, "Wikipedia সার্ভারে এই মুহূর্তে সমস্যা হচ্ছে। কিছুক্ষণ পরে আবার চেষ্টা করো।", "UPSTREAM_ERROR");
   }
 }
 
 app.post("/api/chat", handleChat);
-
+app.get("/api/media", handleMedia);
+app.get("/media", (req, res) => res.sendFile(path.join(__dirname, "media.html")));
 app.get("/api/status", (req, res) => {
   res.set("Cache-Control", "no-store");
   res.json({ ok: true, service: "WikiMaster API", developer: "Sayeef Adnan" });
 });
-
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
-
 app.use((req, res) => {
-  if (req.path.startsWith("/api/")) {
-    return sendError(res, 404, "API endpoint পাওয়া যায়নি।", "ROUTE_NOT_FOUND");
-  }
+  if (req.path.startsWith("/api/")) return sendError(res, 404, "API endpoint পাওয়া যায়নি।", "ROUTE_NOT_FOUND");
   return res.status(404).type("text").send("Page not found.");
 });
 
-if (require.main === module) {
-  app.listen(PORT, () => console.log(`WikiMaster is running at http://localhost:${PORT}`));
-}
+if (require.main === module) app.listen(PORT, () => console.log(`WikiMaster is running at http://localhost:${PORT}`));
 
 module.exports = { app, handleChat };
