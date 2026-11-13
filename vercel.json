@@ -1,4 +1,3 @@
-
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
@@ -6,10 +5,19 @@
     "api/chat.js": {
       "maxDuration": 15
     },
+    "api/media.js": {
+      "maxDuration": 15
+    },
     "api/status.js": {
       "maxDuration": 5
     }
   },
+  "rewrites": [
+    {
+      "source": "/media",
+      "destination": "/media.html"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
